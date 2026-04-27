@@ -1,7 +1,7 @@
 // Central API client — all calls go through here.
-// Base URL reads from NEXT_PUBLIC_API_URL env var, falls back to localhost.
+// Base URL reads from NEXT_PUBLIC_API_URL env var, falls back to production Railway backend.
 
-const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000/api"
+const BASE = process.env.NEXT_PUBLIC_API_URL ?? "https://grievance-hub-mgit-production.up.railway.app/api"
 
 // ── Token helpers (localStorage) ─────────────────────────────────────────────
 
