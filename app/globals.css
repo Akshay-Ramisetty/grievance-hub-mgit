@@ -4,84 +4,100 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: oklch(0.13 0.01 260);
-  --foreground: oklch(0.98 0 0);
-  --card: oklch(0.17 0.01 260);
-  --card-foreground: oklch(0.98 0 0);
-  --popover: oklch(0.17 0.01 260);
-  --popover-foreground: oklch(0.98 0 0);
-  --primary: oklch(0.72 0.19 155);
-  --primary-foreground: oklch(0.13 0.01 260);
-  --secondary: oklch(0.22 0.01 260);
-  --secondary-foreground: oklch(0.98 0 0);
-  --muted: oklch(0.22 0.01 260);
-  --muted-foreground: oklch(0.65 0 0);
-  --accent: oklch(0.72 0.19 155);
-  --accent-foreground: oklch(0.13 0.01 260);
-  --destructive: oklch(0.65 0.2 25);
-  --destructive-foreground: oklch(0.98 0 0);
-  --border: oklch(0.28 0.01 260);
-  --input: oklch(0.22 0.01 260);
-  --ring: oklch(0.72 0.19 155);
-  --chart-1: oklch(0.72 0.19 155);
-  --chart-2: oklch(0.65 0.15 250);
-  --chart-3: oklch(0.75 0.15 50);
-  --chart-4: oklch(0.7 0.2 30);
-  --chart-5: oklch(0.6 0.15 300);
+  /* Base — light theme */
+  --background: #f8f9fb;
+  --foreground: #111827;
+
+  /* Cards / surfaces */
+  --card: #ffffff;
+  --card-foreground: #111827;
+  --popover: #ffffff;
+  --popover-foreground: #111827;
+
+  /* Brand — indigo/blue */
+  --primary: oklch(0.45 0.22 265);
+  --primary-foreground: #ffffff;
+
+  /* Secondary surface */
+  --secondary: #f3f4f6;
+  --secondary-foreground: #111827;
+
+  /* Muted */
+  --muted: #f3f4f6;
+  --muted-foreground: #6b7280;
+
+  /* Accent */
+  --accent: #eff6ff;
+  --accent-foreground: #1d4ed8;
+
+  /* Destructive */
+  --destructive: oklch(0.55 0.22 25);
+  --destructive-foreground: #ffffff;
+
+  /* Borders / inputs */
+  --border: #d1d5db;
+  --input: #ffffff;
+  --ring: #1d4ed8;
+
+  /* Charts */
+  --chart-1: #1d4ed8;
+  --chart-2: #7c3aed;
+  --chart-3: #16a34a;
+  --chart-4: #d97706;
+  --chart-5: #dc2626;
+
   --radius: 0.75rem;
-  --sidebar: oklch(0.15 0.01 260);
-  --sidebar-foreground: oklch(0.98 0 0);
-  --sidebar-primary: oklch(0.72 0.19 155);
-  --sidebar-primary-foreground: oklch(0.13 0.01 260);
-  --sidebar-accent: oklch(0.22 0.01 260);
-  --sidebar-accent-foreground: oklch(0.98 0 0);
-  --sidebar-border: oklch(0.28 0.01 260);
-  --sidebar-ring: oklch(0.72 0.19 155);
-  
-  /* Status colors */
-  --status-pending: oklch(0.75 0.15 50);
-  --status-in-progress: oklch(0.65 0.15 250);
-  --status-resolved: oklch(0.72 0.19 155);
+
+  /* Sidebar */
+  --sidebar: #1e293b;
+  --sidebar-foreground: #f1f5f9;
+  --sidebar-primary: #3b82f6;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #334155;
+  --sidebar-accent-foreground: #f1f5f9;
+  --sidebar-border: #334155;
+  --sidebar-ring: #3b82f6;
+
+  /* Status */
+  --status-pending: #d97706;
+  --status-in-progress: #2563eb;
+  --status-resolved: #16a34a;
 }
 
 .dark {
-  --background: oklch(0.13 0.01 260);
-  --foreground: oklch(0.98 0 0);
-  --card: oklch(0.17 0.01 260);
-  --card-foreground: oklch(0.98 0 0);
-  --popover: oklch(0.17 0.01 260);
-  --popover-foreground: oklch(0.98 0 0);
-  --primary: oklch(0.72 0.19 155);
-  --primary-foreground: oklch(0.13 0.01 260);
-  --secondary: oklch(0.22 0.01 260);
-  --secondary-foreground: oklch(0.98 0 0);
-  --muted: oklch(0.22 0.01 260);
-  --muted-foreground: oklch(0.65 0 0);
-  --accent: oklch(0.72 0.19 155);
-  --accent-foreground: oklch(0.13 0.01 260);
-  --destructive: oklch(0.65 0.2 25);
-  --destructive-foreground: oklch(0.98 0 0);
-  --border: oklch(0.28 0.01 260);
-  --input: oklch(0.22 0.01 260);
-  --ring: oklch(0.72 0.19 155);
-  --chart-1: oklch(0.72 0.19 155);
-  --chart-2: oklch(0.65 0.15 250);
-  --chart-3: oklch(0.75 0.15 50);
-  --chart-4: oklch(0.7 0.2 30);
-  --chart-5: oklch(0.6 0.15 300);
-  --sidebar: oklch(0.15 0.01 260);
-  --sidebar-foreground: oklch(0.98 0 0);
-  --sidebar-primary: oklch(0.72 0.19 155);
-  --sidebar-primary-foreground: oklch(0.13 0.01 260);
-  --sidebar-accent: oklch(0.22 0.01 260);
-  --sidebar-accent-foreground: oklch(0.98 0 0);
-  --sidebar-border: oklch(0.28 0.01 260);
-  --sidebar-ring: oklch(0.72 0.19 155);
+  /* Mirror light theme — dark class is no longer used */
+  --background: #f8f9fb;
+  --foreground: #111827;
+  --card: #ffffff;
+  --card-foreground: #111827;
+  --popover: #ffffff;
+  --popover-foreground: #111827;
+  --primary: oklch(0.45 0.22 265);
+  --primary-foreground: #ffffff;
+  --secondary: #f3f4f6;
+  --secondary-foreground: #111827;
+  --muted: #f3f4f6;
+  --muted-foreground: #6b7280;
+  --accent: #eff6ff;
+  --accent-foreground: #1d4ed8;
+  --destructive: oklch(0.55 0.22 25);
+  --destructive-foreground: #ffffff;
+  --border: #d1d5db;
+  --input: #ffffff;
+  --ring: #1d4ed8;
+  --sidebar: #1e293b;
+  --sidebar-foreground: #f1f5f9;
+  --sidebar-primary: #3b82f6;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #334155;
+  --sidebar-accent-foreground: #f1f5f9;
+  --sidebar-border: #334155;
+  --sidebar-ring: #3b82f6;
 }
 
 @theme inline {
-  --font-sans: 'Geist', 'Geist Fallback';
-  --font-mono: 'Geist Mono', 'Geist Mono Fallback';
+  --font-sans: 'Inter', 'Inter Fallback', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Geist Mono', monospace;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -128,6 +144,282 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
   }
+}
+
+/* Gradient mesh background utility (dark pages) */
+.mesh-bg {
+  background-image:
+    radial-gradient(ellipse 80% 50% at 20% -10%, oklch(0.65 0.22 275 / 0.15) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 110%, oklch(0.58 0.24 295 / 0.12) 0%, transparent 60%);
+}
+
+/* Glass card */
+.glass {
+  background: oklch(0.14 0.025 265 / 0.7);
+  backdrop-filter: blur(16px);
+  border: 1px solid oklch(0.28 0.02 265 / 0.5);
+}
+
+/* Glow ring on focus */
+.glow-ring:focus-within {
+  box-shadow: 0 0 0 3px oklch(0.65 0.22 275 / 0.25);
+}
+
+/* ── Landing page nav link hover ── */
+.lp-nav-link:hover {
+  background-color: #f3f4f6;
+  color: #111827;
+}
+
+/* ── Landing page button hovers ── */
+.lp-btn-green:hover {
+  background-color: var(--lp-green-h) !important;
+  box-shadow: 0 4px 12px 0 rgb(22 163 74 / 0.35) !important;
+  transform: translateY(-1px);
+}
+.lp-btn-green:active {
+  transform: translateY(0);
+}
+
+.lp-btn-blue:hover {
+  background-color: #dbeafe !important;
+  border-color: #93c5fd !important;
+  transform: translateY(-1px);
+}
+/* "Get Started" header button — solid primary, white text */
+.lp-btn-blue[style*="color: #fff"]:hover,
+.lp-btn-primary:hover {
+  background-color: var(--lp-primary-h) !important;
+  box-shadow: 0 4px 12px 0 rgb(29 78 216 / 0.3) !important;
+  background-image: none !important;
+}
+.lp-btn-blue:active {
+  transform: translateY(0);
+}
+.lp-btn-outline:hover {
+  background-color: #f3f4f6 !important;
+  border-color: #d1d5db !important;
+  color: #111827 !important;
+  transform: translateY(-1px);
+}
+.lp-btn-outline:active {
+  transform: translateY(0);
+}
+
+.lp-btn-green,
+.lp-btn-blue,
+.lp-btn-outline,
+.lp-btn-primary {
+  transition: background-color 0.15s, box-shadow 0.15s, border-color 0.15s, color 0.15s, transform 0.15s !important;
+}
+
+/* Footer links */
+.lp-footer-link:hover {
+  color: var(--lp-text) !important;
+}
+
+/* College logo — removes black background on light pages */
+.lp-logo-img {
+  mix-blend-mode: multiply;
+  display: block;
+}
+.landing {
+  --lp-bg:          #f8f9fb;
+  --lp-bg-alt:      #ffffff;
+  --lp-border:      #e4e7ec;
+  --lp-text:        #111827;
+  --lp-text-muted:  #6b7280;
+  --lp-primary:     #1d4ed8;   /* blue-700  */
+  --lp-primary-h:   #1e40af;   /* blue-800  */
+  --lp-green:       #16a34a;   /* green-600 */
+  --lp-green-h:     #15803d;   /* green-700 */
+  --lp-green-bg:    #f0fdf4;
+  --lp-green-ring:  #bbf7d0;
+  --lp-blue-bg:     #eff6ff;
+  --lp-blue-ring:   #bfdbfe;
+  --lp-shadow:      0 1px 3px 0 rgb(0 0 0 / 0.08), 0 1px 2px -1px rgb(0 0 0 / 0.06);
+  --lp-shadow-md:   0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+
+  background-color: var(--lp-bg);
+  color: var(--lp-text);
+}
+
+/* ── Professional Animations ── */
+
+/* Smooth page transitions */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+/* Apply fade-in to main content */
+.animate-fade-in {
+  opacity: 0;
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+.animate-slide-in-left {
+  opacity: 0;
+  animation: slideInFromLeft 0.6s ease-out forwards;
+}
+
+.animate-slide-in-right {
+  opacity: 0;
+  animation: slideInFromRight 0.6s ease-out forwards;
+}
+
+.animate-scale-in {
+  opacity: 0;
+  animation: scaleIn 0.5s ease-out forwards;
+}
+
+/* Stagger animations for lists */
+.stagger-1 { animation-delay: 0.1s; }
+.stagger-2 { animation-delay: 0.2s; }
+.stagger-3 { animation-delay: 0.3s; }
+.stagger-4 { animation-delay: 0.4s; }
+.stagger-5 { animation-delay: 0.5s; }
+.stagger-6 { animation-delay: 0.6s; }
+
+/* Card hover effects */
+.card-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px -4px rgb(0 0 0 / 0.12), 0 8px 16px -8px rgb(0 0 0 / 0.08);
+}
+
+/* Button ripple effect */
+.btn-ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-ripple::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.btn-ripple:active::after {
+  width: 300px;
+  height: 300px;
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Loading shimmer effect */
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 0%,
+    #e0e0e0 20%,
+    #f0f0f0 40%,
+    #f0f0f0 100%
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite linear;
+}
+
+/* Fade in on scroll */
+.fade-in-section {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.fade-in-section.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Smooth transitions for all interactive elements */
+button, a, input, textarea, select {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Focus states with smooth rings */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--lp-primary);
+  outline-offset: 2px;
+  transition: outline-offset 0.2s ease;
+}
+
+/* Pulse animation for notifications */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }

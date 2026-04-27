@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import { ArrowLeft, Search, Clock, User, Building, Calendar, FileText, AlertCircle, CheckCircle, MessageSquare, Star } from "lucide-react"
+import { ArrowLeft, Search, Clock, User, Building, Calendar, FileText, AlertCircle, CheckCircle, MessageSquare } from "lucide-react"
 import { StatusBadge } from "@/components/status-badge"
 import { PriorityBadge } from "@/components/priority-badge"
 import { StarRating } from "@/components/star-rating"
@@ -16,14 +16,14 @@ import Image from "next/image"
 
 function TrackComplaintContent() {
   const searchParams = useSearchParams()
-  const [searchId, setSearchId] = useState("")
+  const [searchId, setSearchId]       = useState("")
   const [hasSearched, setHasSearched] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [complaint, setComplaint] = useState<ComplaintData | null>(null)
-  const [notFound, setNotFound] = useState(false)
-  const [showRating, setShowRating] = useState(false)
-  const [rating, setRating] = useState(0)
-  const [feedback, setFeedback] = useState("")
+  const [loading, setLoading]         = useState(false)
+  const [complaint, setComplaint]     = useState<ComplaintData | null>(null)
+  const [notFound, setNotFound]       = useState(false)
+  const [showRating, setShowRating]   = useState(false)
+  const [rating, setRating]           = useState(0)
+  const [feedback, setFeedback]       = useState("")
   const [submittingRating, setSubmittingRating] = useState(false)
 
   const doSearch = async (id: string) => {
@@ -52,6 +52,7 @@ function TrackComplaintContent() {
     setSubmittingRating(true)
     try {
       await apiRateComplaint(complaint.complaint_id, rating, feedback)
+      // Reload complaint to show rating
       const updated = await apiGetComplaint(complaint.complaint_id)
       setComplaint(updated)
       setShowRating(false)
@@ -126,24 +127,14 @@ function TrackComplaintContent() {
 
       {complaint && (
         <div className="space-y-5">
-          {/* Header */}
           <div className="flex flex-col gap-4 rounded-xl border border-gray-200 bg-white p-6 shadow-sm sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-xs text-gray-400 mb-1">Complaint ID</p>
               <code className="font-mono text-xl font-bold text-gray-900">{complaint.complaint_id}</code>
             </div>
-            <div className="flex flex-wrap gap-2">
-              <StatusBadge status={complaint.status} className="text-sm" />
-              <PriorityBadge priority={complaint.priority} className="text-sm" />
-              {complaint.is_anonymous && (
-                <span className="inline-flex items-center gap-1 rounded-full border border-purple-200 bg-purple-50 px-3 py-1 text-xs font-medium text-purple-700">
-                  Anonymous
-                </span>
-              )}
-            </div>
+            <StatusBadge status={complaint.status} className="text-sm w-fit" />
           </div>
 
-          {/* Details */}
           <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm space-y-5">
             <h2 className="text-lg font-semibold text-gray-900">{complaint.title}</h2>
 
@@ -164,12 +155,6 @@ function TrackComplaintContent() {
               ))}
             </div>
 
-            {complaint.resolution_time && (
-              <div className="rounded-lg border border-green-100 bg-green-50 p-4">
-                <p className="text-xs text-green-600 font-medium">Resolved in {complaint.resolution_time} hours</p>
-              </div>
-            )}
-
             <div>
               <p className="text-xs text-gray-400 mb-2">Description</p>
               <p className="rounded-lg border border-gray-100 bg-gray-50 p-4 text-sm text-gray-700 leading-relaxed">{complaint.description}</p>
@@ -182,55 +167,18 @@ function TrackComplaintContent() {
               </div>
             )}
 
-            {!complaint.is_anonymous && (
-              <div className="flex items-start gap-3 rounded-lg border border-gray-100 bg-gray-50 p-4">
-                <User className="mt-0.5 h-4 w-4 shrink-0 text-gray-400" />
-                <div>
-                  <p className="text-xs text-gray-400">Submitted By</p>
-                  <p className="mt-0.5 text-sm font-medium text-gray-900">
-                    {complaint.student_name} <span className="text-gray-400 font-normal">({complaint.student_roll_no})</span>
-                  </p>
-                  <p className="text-xs text-gray-400">{complaint.student_department}</p>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Activity Timeline */}
-          {complaint.activities && complaint.activities.length > 0 && (
-            <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-              <h3 className="mb-5 font-semibold text-gray-900 flex items-center gap-2">
-                <MessageSquare className="h-4 w-4" />
-                Activity Timeline
-              </h3>
-              <div className="space-y-4">
-                {complaint.activities.map((activity, i) => (
-                  <div key={activity.id} className="flex gap-3">
-                    <div className="flex flex-col items-center">
-                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 border-blue-200 bg-blue-50">
-                        <div className="h-2 w-2 rounded-full bg-blue-600" />
-                      </div>
-                      {i < complaint.activities.length - 1 && (
-                        <div className="w-px flex-1 bg-gray-200 my-1" style={{ minHeight: "1.5rem" }} />
-                      )}
-                    </div>
-                    <div className="flex-1 pb-4">
-                      <p className="text-sm font-medium text-gray-900">{activity.description}</p>
-                      <div className="mt-1 flex items-center gap-2 text-xs text-gray-400">
-                        {activity.performed_by_name && <span>{activity.performed_by_name}</span>}
-                        {activity.performed_by_name && <span>·</span>}
-                        <span>{new Date(activity.created_at).toLocaleString("en-US", { 
-                          month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" 
-                        })}</span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+            <div className="flex items-start gap-3 rounded-lg border border-gray-100 bg-gray-50 p-4">
+              <User className="mt-0.5 h-4 w-4 shrink-0 text-gray-400" />
+              <div>
+                <p className="text-xs text-gray-400">Submitted By</p>
+                <p className="mt-0.5 text-sm font-medium text-gray-900">
+                  {complaint.student_name} <span className="text-gray-400 font-normal">({complaint.student_roll_no})</span>
+                </p>
+                <p className="text-xs text-gray-400">{complaint.student_department}</p>
               </div>
             </div>
-          )}
+          </div>
 
-          {/* Status Timeline */}
           <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
             <h3 className="mb-5 font-semibold text-gray-900">Status Timeline</h3>
             {timelineSteps.map((step, i) => (
@@ -252,69 +200,6 @@ function TrackComplaintContent() {
               </div>
             ))}
           </div>
-
-          {/* Rating Section */}
-          {complaint.rating ? (
-            <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-              <h3 className="mb-4 font-semibold text-gray-900 flex items-center gap-2">
-                <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
-                Your Rating
-              </h3>
-              <div className="flex items-center gap-3 mb-3">
-                <StarRating rating={complaint.rating} readonly size="lg" />
-                <span className="text-lg font-semibold text-gray-900">{complaint.rating}/5</span>
-              </div>
-              {complaint.feedback && (
-                <div className="rounded-lg border border-gray-100 bg-gray-50 p-4">
-                  <p className="text-sm text-gray-700">{complaint.feedback}</p>
-                </div>
-              )}
-            </div>
-          ) : canRate && !showRating && (
-            <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-              <h3 className="mb-2 font-semibold text-gray-900">Rate This Resolution</h3>
-              <p className="text-sm text-gray-500 mb-4">Help us improve by rating your experience</p>
-              <Button onClick={() => setShowRating(true)} className="bg-blue-700 hover:bg-blue-800 text-white">
-                Rate Now
-              </Button>
-            </div>
-          )}
-
-          {showRating && (
-            <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-              <h3 className="mb-4 font-semibold text-gray-900">Rate This Resolution</h3>
-              <div className="space-y-4">
-                <div>
-                  <Label className="text-sm font-medium text-gray-700 mb-2 block">Your Rating</Label>
-                  <StarRating rating={rating} onRatingChange={setRating} size="lg" />
-                </div>
-                <div>
-                  <Label htmlFor="feedback" className="text-sm font-medium text-gray-700">
-                    Feedback <span className="text-gray-400 font-normal">(Optional)</span>
-                  </Label>
-                  <Textarea
-                    id="feedback"
-                    placeholder="Share your experience..."
-                    value={feedback}
-                    onChange={(e) => setFeedback(e.target.value)}
-                    className="mt-1.5 min-h-24"
-                  />
-                </div>
-                <div className="flex gap-2">
-                  <Button 
-                    onClick={handleRatingSubmit} 
-                    disabled={rating === 0 || submittingRating}
-                    className="bg-blue-700 hover:bg-blue-800 text-white"
-                  >
-                    {submittingRating ? "Submitting..." : "Submit Rating"}
-                  </Button>
-                  <Button variant="outline" onClick={() => setShowRating(false)}>
-                    Cancel
-                  </Button>
-                </div>
-              </div>
-            </div>
-          )}
 
           <div className="flex gap-3">
             <Button variant="outline" className="flex-1" asChild>

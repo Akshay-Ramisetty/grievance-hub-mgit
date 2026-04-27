@@ -1,268 +1,256 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useCallback } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import {
-  MessageSquare,
-  Plus,
-  Search,
-  FileText,
-  Clock,
-  CheckCircle,
-  AlertCircle,
-  LogOut,
-  Bell,
-  ChevronRight,
+  Plus, Search, FileText, Clock, CheckCircle,
+  AlertCircle, LogOut, Bell, ChevronRight, LayoutDashboard,
 } from "lucide-react"
-import { useComplaints } from "@/lib/complaint-context"
 import { StatusBadge } from "@/components/status-badge"
+import { PriorityBadge } from "@/components/priority-badge"
+import { apiGetComplaints, apiLogout, currentUser, type ComplaintData, type UserData } from "@/lib/api"
+import Image from "next/image"
 
 export default function StudentDashboardPage() {
   const router = useRouter()
-  const { complaints, currentStudent } = useComplaints()
+  const [user, setUser]           = useState<UserData | null>(null)
+  const [complaints, setComplaints] = useState<ComplaintData[]>([])
+  const [loading, setLoading]     = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
-  const [filterStatus, setFilterStatus] = useState<string>("all")
+  const [filterStatus, setFilterStatus] = useState("all")
 
-  // Get student's complaints (for demo, show all complaints)
-  const studentComplaints = currentStudent
-    ? complaints.filter((c) => c.studentEmail === currentStudent.email)
-    : complaints.slice(0, 3) // Show demo complaints if no student logged in
+  const load = useCallback(async () => {
+    setLoading(true)
+    try {
+      const u = currentUser.get() as UserData | null
+      if (!u) { router.push("/student/login"); return }
+      setUser(u)
+      const res = await apiGetComplaints()
+      setComplaints(res.results)
+    } catch {
+      router.push("/student/login")
+    } finally {
+      setLoading(false)
+    }
+  }, [router])
 
-  const filteredComplaints = studentComplaints.filter((complaint) => {
-    const matchesSearch =
-      complaint.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      complaint.id.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesStatus = filterStatus === "all" || complaint.status === filterStatus
-    return matchesSearch && matchesStatus
+  useEffect(() => { load() }, [load])
+
+  const filtered = complaints.filter((c) => {
+    const matchSearch =
+      c.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      c.complaint_id.toLowerCase().includes(searchQuery.toLowerCase())
+    const matchStatus = filterStatus === "all" || c.status === filterStatus
+    return matchSearch && matchStatus
   })
 
   const stats = {
-    total: studentComplaints.length,
-    pending: studentComplaints.filter((c) => c.status === "pending").length,
-    inProgress: studentComplaints.filter((c) => c.status === "in-progress").length,
-    resolved: studentComplaints.filter((c) => c.status === "resolved").length,
+    total:      complaints.length,
+    pending:    complaints.filter((c) => c.status === "pending").length,
+    inProgress: complaints.filter((c) => c.status === "in-progress").length,
+    resolved:   complaints.filter((c) => c.status === "resolved").length,
   }
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await apiLogout()
     router.push("/")
   }
 
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="mx-auto mb-3 h-8 w-8 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
+          <p className="text-sm text-gray-500">Loading dashboard…</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur">
+      <header className="sticky top-0 z-50 border-b border-gray-200 bg-white/90 backdrop-blur-sm shadow-sm">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
-              <MessageSquare className="h-5 w-5 text-primary-foreground" />
+          <div className="flex items-center gap-3">
+            <div style={{ width: 34, height: 44, overflow: "hidden", flexShrink: 0 }}>
+              <Image src="/mgit-logo.png" alt="MGIT" width={148} height={44}
+                style={{ width: 148, height: 44, maxWidth: "none", mixBlendMode: "multiply" }} />
             </div>
-            <span className="text-xl font-semibold text-foreground">GrievanceHub-MGIT</span>
-          </Link>
-          <div className="flex items-center gap-4">
-            <button className="relative rounded-lg p-2 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">
-              <Bell className="h-5 w-5" />
-              <span className="absolute right-1 top-1 flex h-2 w-2 rounded-full bg-primary" />
+            <span className="font-bold text-gray-900 hidden sm:block">
+              GrievanceHub<span className="text-blue-700">-MGIT</span>
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <button className="relative rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors">
+              <Bell className="h-4 w-4" />
+              {stats.pending > 0 && <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-blue-600" />}
             </button>
-            <Button variant="ghost" size="sm" onClick={handleLogout} className="gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-700 border border-blue-200">
+              {(user?.name || "S")[0].toUpperCase()}
+            </div>
+            <Button variant="ghost" size="sm" onClick={handleLogout} className="gap-1.5 text-gray-500 hover:text-gray-900">
               <LogOut className="h-4 w-4" />
-              <span className="hidden sm:inline">Logout</span>
+              <span className="hidden sm:inline text-xs">Logout</span>
             </Button>
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        {/* Welcome Section */}
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-foreground sm:text-3xl">
-            Welcome back, {currentStudent?.fullName || "Student"}
-          </h1>
-          <p className="mt-1 text-muted-foreground">
-            Manage and track your complaints from your dashboard
-          </p>
-        </div>
-
-        {/* Quick Actions */}
-        <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <Button
-            asChild
-            size="lg"
-            className="h-auto flex-col gap-2 py-6"
-          >
-            <Link href="/student/submit">
-              <Plus className="h-6 w-6" />
-              <span className="text-lg">Submit New Complaint</span>
-            </Link>
-          </Button>
-          <Button
-            asChild
-            variant="outline"
-            size="lg"
-            className="h-auto flex-col gap-2 py-6"
-          >
-            <Link href="/student/track">
-              <Search className="h-6 w-6" />
-              <span className="text-lg">Track Complaint</span>
-            </Link>
-          </Button>
-          <Button
-            variant="outline"
-            size="lg"
-            className="h-auto flex-col gap-2 py-6 sm:col-span-2 lg:col-span-1"
-            onClick={() => setFilterStatus("all")}
-          >
-            <FileText className="h-6 w-6" />
-            <span className="text-lg">View All Complaints</span>
+        {/* Welcome */}
+        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <div className="flex items-center gap-2 text-sm text-gray-400 mb-1">
+              <LayoutDashboard className="h-3.5 w-3.5" /> Dashboard
+            </div>
+            <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
+              Welcome back, <span className="text-blue-700">{user?.name || "Student"}</span>
+            </h1>
+            <p className="mt-0.5 text-sm text-gray-500">
+              {user?.roll_number && <span className="mr-2 font-mono">{user.roll_number}</span>}
+              {user?.department}
+            </p>
+          </div>
+          <Button asChild className="gap-2 bg-blue-700 hover:bg-blue-800 text-white shadow-sm">
+            <Link href="/student/submit"><Plus className="h-4 w-4" /> New Complaint</Link>
           </Button>
         </div>
 
-        {/* Stats Cards */}
-        <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <Card className="border-border bg-card">
-            <CardContent className="flex items-center gap-4 p-6">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-secondary">
-                <FileText className="h-6 w-6 text-foreground" />
+        {/* Stats */}
+        <div className="mb-8 grid gap-4 grid-cols-2 lg:grid-cols-4">
+          {[
+            { label: "Total",       value: stats.total,      icon: FileText,    color: "text-gray-600",   bg: "bg-gray-100"   },
+            { label: "Pending",     value: stats.pending,    icon: AlertCircle, color: "text-amber-600",  bg: "bg-amber-50"   },
+            { label: "In Progress", value: stats.inProgress, icon: Clock,       color: "text-blue-600",   bg: "bg-blue-50"    },
+            { label: "Resolved",    value: stats.resolved,   icon: CheckCircle, color: "text-green-600",  bg: "bg-green-50"   },
+          ].map((s) => (
+            <div key={s.label} className="rounded-xl border border-gray-200 bg-white p-5 flex items-center gap-4 shadow-sm">
+              <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${s.bg}`}>
+                <s.icon className={`h-5 w-5 ${s.color}`} />
               </div>
               <div>
-                <p className="text-2xl font-bold text-foreground">{stats.total}</p>
-                <p className="text-sm text-muted-foreground">Total Complaints</p>
+                <p className="text-2xl font-bold text-gray-900">{s.value}</p>
+                <p className="text-xs text-gray-500">{s.label}</p>
               </div>
-            </CardContent>
-          </Card>
-          <Card className="border-border bg-card">
-            <CardContent className="flex items-center gap-4 p-6">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-status-pending/10">
-                <AlertCircle className="h-6 w-6 text-status-pending" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-foreground">{stats.pending}</p>
-                <p className="text-sm text-muted-foreground">Pending</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="border-border bg-card">
-            <CardContent className="flex items-center gap-4 p-6">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-status-in-progress/10">
-                <Clock className="h-6 w-6 text-status-in-progress" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-foreground">{stats.inProgress}</p>
-                <p className="text-sm text-muted-foreground">In Progress</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="border-border bg-card">
-            <CardContent className="flex items-center gap-4 p-6">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-status-resolved/10">
-                <CheckCircle className="h-6 w-6 text-status-resolved" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-foreground">{stats.resolved}</p>
-                <p className="text-sm text-muted-foreground">Resolved</p>
-              </div>
-            </CardContent>
-          </Card>
+            </div>
+          ))}
         </div>
 
-        {/* Complaints Section */}
-        <Card className="border-border bg-card">
-          <CardHeader>
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <CardTitle className="text-foreground">Your Complaints</CardTitle>
-                <CardDescription className="text-muted-foreground">
-                  View and track all your submitted complaints
-                </CardDescription>
-              </div>
-              <div className="flex gap-2">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    placeholder="Search complaints..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 sm:w-64"
-                  />
+        {/* Quick actions */}
+        <div className="mb-8 grid gap-3 sm:grid-cols-2">
+          <Link href="/student/submit"
+            className="group flex items-center gap-4 rounded-xl border border-blue-200 bg-blue-50 p-5 transition-all hover:border-blue-300 hover:shadow-md">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100">
+              <Plus className="h-5 w-5 text-blue-700" />
+            </div>
+            <div className="flex-1">
+              <p className="font-semibold text-gray-900">Submit New Complaint</p>
+              <p className="text-xs text-gray-500">File a new grievance</p>
+            </div>
+            <ChevronRight className="h-4 w-4 text-gray-400 transition-transform group-hover:translate-x-1" />
+          </Link>
+          <Link href="/student/track"
+            className="group flex items-center gap-4 rounded-xl border border-gray-200 bg-white p-5 transition-all hover:border-blue-200 hover:shadow-md">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100">
+              <Search className="h-5 w-5 text-gray-500" />
+            </div>
+            <div className="flex-1">
+              <p className="font-semibold text-gray-900">Track by ID</p>
+              <p className="text-xs text-gray-500">Look up any complaint</p>
+            </div>
+            <ChevronRight className="h-4 w-4 text-gray-400 transition-transform group-hover:translate-x-1" />
+          </Link>
+        </div>
+
+        {/* Complaints list */}
+        <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
+          <div className="flex flex-col gap-4 border-b border-gray-100 p-5 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="font-semibold text-gray-900">Your Complaints</h2>
+              <p className="text-xs text-gray-400">{filtered.length} complaint{filtered.length !== 1 ? "s" : ""}</p>
+            </div>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gray-400" />
+              <Input placeholder="Search..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
+                className="h-9 w-full pl-9 sm:w-56" />
+            </div>
+          </div>
+
+          {/* Filter pills */}
+          <div className="flex gap-2 overflow-x-auto px-5 py-3 border-b border-gray-100">
+            {[
+              { value: "all",         label: "All"         },
+              { value: "pending",     label: "Pending"     },
+              { value: "in-progress", label: "In Progress" },
+              { value: "resolved",    label: "Resolved"    },
+            ].map((f) => (
+              <button key={f.value} onClick={() => setFilterStatus(f.value)}
+                className={`shrink-0 rounded-full px-3.5 py-1 text-xs font-medium transition-colors ${
+                  filterStatus === f.value
+                    ? "bg-blue-700 text-white shadow-sm"
+                    : "bg-gray-100 text-gray-500 hover:text-gray-900"
+                }`}>
+                {f.label}
+              </button>
+            ))}
+          </div>
+
+          <div className="p-5">
+            {filtered.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-14 text-center">
+                <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-gray-100">
+                  <FileText className="h-6 w-6 text-gray-400" />
                 </div>
-              </div>
-            </div>
-            {/* Filter Pills */}
-            <div className="flex flex-wrap gap-2 pt-4">
-              {[
-                { value: "all", label: "All" },
-                { value: "pending", label: "Pending" },
-                { value: "in-progress", label: "In Progress" },
-                { value: "resolved", label: "Resolved" },
-              ].map((filter) => (
-                <button
-                  key={filter.value}
-                  onClick={() => setFilterStatus(filter.value)}
-                  className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
-                    filterStatus === filter.value
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-secondary text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  {filter.label}
-                </button>
-              ))}
-            </div>
-          </CardHeader>
-          <CardContent>
-            {filteredComplaints.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-12 text-center">
-                <FileText className="mb-4 h-12 w-12 text-muted-foreground" />
-                <h3 className="text-lg font-semibold text-foreground">No complaints found</h3>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {searchQuery
-                    ? "Try adjusting your search query"
-                    : "You haven't submitted any complaints yet"}
+                <p className="font-medium text-gray-900">No complaints found</p>
+                <p className="mt-1 text-sm text-gray-500">
+                  {searchQuery ? "Try a different search" : "Submit your first complaint to get started"}
                 </p>
-                <Button asChild className="mt-4">
-                  <Link href="/student/submit">Submit Your First Complaint</Link>
-                </Button>
+                {!searchQuery && (
+                  <Button asChild className="mt-4 bg-blue-700 hover:bg-blue-800 text-white" size="sm">
+                    <Link href="/student/submit">Submit Complaint</Link>
+                  </Button>
+                )}
               </div>
             ) : (
-              <div className="space-y-4">
-                {filteredComplaints.map((complaint) => (
-                  <Link
-                    key={complaint.id}
-                    href={`/student/track?id=${complaint.id}`}
-                    className="group flex items-center justify-between rounded-lg border border-border bg-secondary/30 p-4 transition-colors hover:bg-secondary/50"
-                  >
-                    <div className="flex-1 space-y-1">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="font-mono text-xs text-muted-foreground">
-                          {complaint.id}
-                        </span>
-                        <StatusBadge status={complaint.status} />
+              <div className="space-y-3">
+                {filtered.map((c) => (
+                  <Link key={c.complaint_id} href={`/student/track?id=${c.complaint_id}`}
+                    className="group flex items-center gap-4 rounded-lg border border-gray-100 bg-gray-50 p-4 transition-all hover:border-blue-200 hover:bg-blue-50/50">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-wrap items-center gap-2 mb-1">
+                        <code className="text-xs text-gray-400 font-mono">{c.complaint_id}</code>
+                        <StatusBadge status={c.status} />
+                        <PriorityBadge priority={c.priority} showIcon={false} />
+                        {c.is_anonymous && (
+                          <span className="inline-flex items-center gap-1 rounded-full border border-purple-200 bg-purple-50 px-2 py-0.5 text-xs font-medium text-purple-700">
+                            Anonymous
+                          </span>
+                        )}
                       </div>
-                      <h3 className="font-semibold text-foreground group-hover:text-primary">
-                        {complaint.title}
-                      </h3>
-                      <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
-                        <span className="capitalize">{complaint.category}</span>
-                        <span>
-                          {new Date(complaint.createdAt).toLocaleDateString("en-US", {
-                            year: "numeric",
-                            month: "short",
-                            day: "numeric",
-                          })}
-                        </span>
+                      <p className="font-medium text-gray-900 truncate group-hover:text-blue-700 transition-colors">{c.title}</p>
+                      <div className="mt-1 flex items-center gap-3 text-xs text-gray-400">
+                        <span className="capitalize">{c.category}</span>
+                        <span>·</span>
+                        <span>{new Date(c.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>
+                        {c.resolved_at && c.resolution_time && (
+                          <>
+                            <span>·</span>
+                            <span>Resolved in {c.resolution_time}h</span>
+                          </>
+                        )}
                       </div>
                     </div>
-                    <ChevronRight className="h-5 w-5 text-muted-foreground transition-transform group-hover:translate-x-1" />
+                    <ChevronRight className="h-4 w-4 shrink-0 text-gray-400 transition-transform group-hover:translate-x-1" />
                   </Link>
                 ))}
               </div>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </main>
     </div>
   )
