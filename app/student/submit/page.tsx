@@ -55,6 +55,25 @@ const roomTypes = [
   { value: 'staff_room', label: 'Staff Room' }
 ]
 
+const getRoomOptions = (roomType: string) => {
+  if (roomType === 'classroom') {
+    return [
+      { value: '02', label: 'Room 02' },
+      { value: '03', label: 'Room 03' },
+      { value: '04', label: 'Room 04' },
+      { value: '05', label: 'Room 05' }
+    ]
+  } else if (roomType === 'lab') {
+    return [
+      { value: '01', label: 'Lab 1 (Room 01)' },
+      { value: '06', label: 'Lab 2 (Room 06)' }
+    ]
+  } else if (roomType === 'staff_room') {
+    return [{ value: '04', label: 'Staff Room' }]
+  }
+  return []
+}
+
 export default function SubmitComplaintPage() {
   const router = useRouter()
   const [showSuccess, setShowSuccess] = useState(false)
@@ -74,6 +93,7 @@ export default function SubmitComplaintPage() {
     floor: "",
     room_type: "",
     room_number: "",
+    room_selection: "", // NEW: for selecting specific room
     gender: ""
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -81,27 +101,13 @@ export default function SubmitComplaintPage() {
   const needsLocation = ['infrastructure', 'washroom', 'classroom', 'lab'].includes(formData.category)
   const needsGender = formData.category === 'washroom'
   const availableFloors = formData.block ? floorsByBlock[formData.block] || [] : []
+  const availableRooms = formData.room_type ? getRoomOptions(formData.room_type) : []
 
   const generateRoomNumber = () => {
-    if (!formData.block || !formData.floor || !formData.room_type) return ""
+    if (!formData.block || !formData.floor || !formData.room_selection) return ""
     
     const floorNum = formData.floor === 'Ground Floor' ? '0' : formData.floor.charAt(0)
-    let roomNum = '01'
-    
-    // Labs are typically rooms 01 and 06
-    if (formData.room_type === 'lab') {
-      roomNum = '01' // Default to first lab
-    } 
-    // Classrooms are 02, 03, 04, 05
-    else if (formData.room_type === 'classroom') {
-      roomNum = '02' // Default to first classroom
-    }
-    // Staff room is in the middle
-    else if (formData.room_type === 'staff_room') {
-      roomNum = '04'
-    }
-    
-    return `${formData.block}${floorNum}${roomNum}`
+    return `${formData.block}${floorNum}${formData.room_selection}`
   }
 
   const validate = () => {
@@ -115,7 +121,10 @@ export default function SubmitComplaintPage() {
     if (needsLocation) {
       if (!formData.block) e.block = "Block is required"
       if (!formData.floor) e.floor = "Floor is required"
-      if (formData.category !== 'washroom' && !formData.room_type) e.room_type = "Room type is required"
+      if (formData.category !== 'washroom') {
+        if (!formData.room_type) e.room_type = "Room type is required"
+        if (!formData.room_selection) e.room_selection = "Please select a specific room"
+      }
     }
     
     if (needsGender && !formData.gender) e.gender = "Please specify washroom type"
@@ -320,25 +329,51 @@ export default function SubmitComplaintPage() {
 
               {/* Room Type - Not for washrooms */}
               {formData.category !== 'washroom' && (
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-700">Room Type *</Label>
-                  <Select value={formData.room_type} onValueChange={(v) => setFormData({ ...formData, room_type: v })}>
-                    <SelectTrigger className={errors.room_type ? "border-red-400" : ""}>
-                      <SelectValue placeholder="Select room type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {roomTypes.filter(rt => rt.value !== 'washroom').map((rt) => (
-                        <SelectItem key={rt.value} value={rt.value}>{rt.label}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {errors.room_type && <p className="text-xs text-red-500">{errors.room_type}</p>}
-                  {formData.room_type && formData.block && formData.floor && (
-                    <p className="text-xs text-gray-500">
-                      Room Number: {generateRoomNumber()}
-                    </p>
+                <>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-gray-700">Room Type *</Label>
+                    <Select value={formData.room_type} onValueChange={(v) => setFormData({ ...formData, room_type: v, room_selection: "" })}>
+                      <SelectTrigger className={errors.room_type ? "border-red-400" : ""}>
+                        <SelectValue placeholder="Select room type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {roomTypes.filter(rt => rt.value !== 'washroom').map((rt) => (
+                          <SelectItem key={rt.value} value={rt.value}>{rt.label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {errors.room_type && <p className="text-xs text-red-500">{errors.room_type}</p>}
+                  </div>
+
+                  {/* Room Selection - Show after room type is selected */}
+                  {formData.room_type && availableRooms.length > 0 && (
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium text-gray-700">Select Specific Room *</Label>
+                      <Select 
+                        value={formData.room_selection} 
+                        onValueChange={(v) => setFormData({ ...formData, room_selection: v })}
+                        disabled={!formData.room_type}
+                      >
+                        <SelectTrigger className={errors.room_selection ? "border-red-400" : ""}>
+                          <SelectValue placeholder="Choose room" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {availableRooms.map((room) => (
+                            <SelectItem key={room.value} value={room.value}>{room.label}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {errors.room_selection && <p className="text-xs text-red-500">{errors.room_selection}</p>}
+                      {formData.room_selection && formData.block && formData.floor && (
+                        <div className="rounded-md bg-blue-50 border border-blue-200 px-3 py-2">
+                          <p className="text-sm font-medium text-blue-700">
+                            Room Number: {generateRoomNumber()}
+                          </p>
+                        </div>
+                      )}
+                    </div>
                   )}
-                </div>
+                </>
               )}
 
               {/* Gender - Only for washrooms */}
