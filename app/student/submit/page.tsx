@@ -40,12 +40,12 @@ const priorities: { value: Priority; label: string; color: string }[] = [
 const blocks = ['A', 'B', 'C', 'D', 'E', 'F']
 
 const floorsByBlock: Record<string, string[]> = {
-  'A': ['Ground Floor', '1st Floor'],
-  'B': ['Ground Floor', '1st Floor', '2nd Floor'],
-  'C': ['Ground Floor', '1st Floor', '2nd Floor'],
-  'D': ['Ground Floor', '1st Floor', '2nd Floor', '3rd Floor'],
-  'E': ['Ground Floor', '1st Floor', '2nd Floor', '3rd Floor', '4th Floor', '5th Floor', '6th Floor'],
-  'F': ['Ground Floor']
+  'A': ['Ground Floor', '1st Floor'],  // 2 floors total
+  'B': ['Ground Floor', '1st Floor', '2nd Floor'],  // 3 floors total
+  'C': ['Ground Floor', '1st Floor', '2nd Floor'],  // 3 floors total
+  'D': ['Ground Floor', '1st Floor', '2nd Floor', '3rd Floor', '4th Floor'],  // 5 floors total (was 4)
+  'E': ['Ground Floor', '1st Floor', '2nd Floor', '3rd Floor', '4th Floor', '5th Floor', '6th Floor'],  // 7 floors total
+  'F': ['Ground Floor']  // 1 floor total
 }
 
 const roomTypes = [

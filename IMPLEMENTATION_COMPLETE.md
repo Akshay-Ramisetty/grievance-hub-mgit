@@ -27,12 +27,12 @@
 ## 2. Location-Based Complaint System ✅
 
 ### Block Configuration:
-- **Block A**: 2 floors (Ground + 1st)
-- **Block B**: 3 floors (Ground + 1st + 2nd)
-- **Block C**: 3 floors (Ground + 1st + 2nd)
-- **Block D**: 4 floors (Ground + 1st + 2nd + 3rd)
-- **Block E**: 7 floors (Ground + 1st through 6th)
-- **Block F**: 1 floor (Ground - Clubs only)
+- **Block A**: 2 floors total (Ground + 1st)
+- **Block B**: 3 floors total (Ground + 1st + 2nd)
+- **Block C**: 3 floors total (Ground + 1st + 2nd)
+- **Block D**: 5 floors total (Ground + 1st + 2nd + 3rd + 4th)
+- **Block E**: 7 floors total (Ground + 1st through 6th)
+- **Block F**: 1 floor total (Ground - Clubs only)
 
 ### Room Structure Per Floor:
 - **2 Labs**: Rooms 01 and 06
