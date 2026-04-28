@@ -17,7 +17,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['name', 'roll_number', 'email', 'department', 'password', 'confirm_password']
+        fields = ['name', 'roll_number', 'email', 'branch', 'year', 'department', 'password', 'confirm_password']
 
     def validate_email(self, value):
         if not MGIT_EMAIL_RE.match(value):
@@ -47,7 +47,7 @@ class LoginSerializer(serializers.Serializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'name', 'roll_number', 'email', 'department', 'role', 'created_at']
+        fields = ['id', 'name', 'roll_number', 'email', 'branch', 'year', 'department', 'role', 'created_at']
         read_only_fields = ['id', 'role', 'created_at']
 
 
@@ -75,6 +75,7 @@ class ComplaintSerializer(serializers.ModelSerializer):
         fields = [
             'complaint_id', 'title', 'category', 'description', 'status', 'priority',
             'assigned_department', 'remarks', 'attachment', 'is_anonymous',
+            'block', 'floor', 'room_type', 'room_number', 'gender',
             'rating', 'feedback', 'resolved_at', 'resolution_time',
             'student_name', 'student_roll_no', 'student_email', 'student_department',
             'activities', 'created_at', 'updated_at',
@@ -97,7 +98,8 @@ class ComplaintSerializer(serializers.ModelSerializer):
 class ComplaintSubmitSerializer(serializers.ModelSerializer):
     class Meta:
         model = Complaint
-        fields = ['title', 'category', 'description', 'attachment', 'priority', 'is_anonymous']
+        fields = ['title', 'category', 'description', 'attachment', 'priority', 'is_anonymous', 
+                  'block', 'floor', 'room_type', 'room_number', 'gender']
 
     def validate_description(self, value):
         if len(value.strip()) < 20:
