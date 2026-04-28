@@ -25,20 +25,33 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin):
     ROLE_CHOICES = [('student', 'Student'), ('admin', 'Admin')]
-    DEPARTMENT_CHOICES = [
-        ('Computer Science', 'Computer Science'),
-        ('Electronics', 'Electronics'),
-        ('Mechanical', 'Mechanical'),
-        ('Civil', 'Civil'),
-        ('Electrical', 'Electrical'),
-        ('Information Technology', 'Information Technology'),
+    BRANCH_CHOICES = [
+        ('CSE', 'Computer Science Engineering'),
+        ('IT', 'Information Technology'),
+        ('ECE', 'Electronics & Communication Engineering'),
+        ('EEE', 'Electrical & Electronics Engineering'),
+        ('MECH', 'Mechanical Engineering'),
+        ('CIVIL', 'Civil Engineering'),
+        ('CSB', 'Computer Science & Business Systems'),
+        ('CSM', 'Computer Science & Mathematics'),
+        ('CSD', 'Computer Science & Design'),
+        ('MECHATRONICS', 'Mechatronics Engineering'),
+        ('MME', 'Metallurgical & Materials Engineering'),
+    ]
+    YEAR_CHOICES = [
+        ('1', '1st Year'),
+        ('2', '2nd Year'),
+        ('3', '3rd Year'),
+        ('4', '4th Year'),
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=150)
     roll_number = models.CharField(max_length=20, unique=True, blank=True, null=True)
     email = models.EmailField(unique=True)
-    department = models.CharField(max_length=100, blank=True, null=True)
+    branch = models.CharField(max_length=20, choices=BRANCH_CHOICES, blank=True, null=True)
+    year = models.CharField(max_length=1, choices=YEAR_CHOICES, blank=True, null=True)
+    department = models.CharField(max_length=100, blank=True, null=True)  # Keep for backward compatibility
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='student')
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
@@ -69,10 +82,14 @@ class Complaint(models.Model):
     ]
     CATEGORY_CHOICES = [
         ('academics', 'Academics'),
-        ('facilities', 'Facilities'),
+        ('infrastructure', 'Infrastructure'),
+        ('washroom', 'Washroom'),
+        ('classroom', 'Classroom'),
+        ('lab', 'Lab'),
         ('hostel', 'Hostel'),
         ('library', 'Library'),
-        ('infrastructure', 'Infrastructure'),
+        ('canteen', 'Canteen'),
+        ('sports', 'Sports'),
         ('administration', 'Administration'),
         ('other', 'Other'),
     ]
@@ -92,6 +109,20 @@ class Complaint(models.Model):
         ('Maintenance', 'Maintenance'),
         ('Administration', 'Administration'),
     ]
+    BLOCK_CHOICES = [
+        ('A', 'Block A'),
+        ('B', 'Block B'),
+        ('C', 'Block C'),
+        ('D', 'Block D'),
+        ('E', 'Block E'),
+        ('F', 'Block F'),
+    ]
+    ROOM_TYPE_CHOICES = [
+        ('classroom', 'Classroom'),
+        ('lab', 'Lab'),
+        ('washroom', 'Washroom'),
+        ('staff_room', 'Staff Room'),
+    ]
 
     complaint_id = models.CharField(max_length=30, unique=True, editable=False)
     student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='complaints', null=True, blank=True)
@@ -104,6 +135,14 @@ class Complaint(models.Model):
     remarks = models.TextField(blank=True, null=True)
     attachment = models.FileField(upload_to=complaint_upload_path, blank=True, null=True)
     is_anonymous = models.BooleanField(default=False)
+    
+    # Location fields
+    block = models.CharField(max_length=1, choices=BLOCK_CHOICES, blank=True, null=True)
+    floor = models.CharField(max_length=10, blank=True, null=True)
+    room_type = models.CharField(max_length=20, choices=ROOM_TYPE_CHOICES, blank=True, null=True)
+    room_number = models.CharField(max_length=20, blank=True, null=True)
+    gender = models.CharField(max_length=10, blank=True, null=True)  # For washrooms
+    
     rating = models.IntegerField(null=True, blank=True, choices=[(i, i) for i in range(1, 6)])
     feedback = models.TextField(blank=True, null=True)
     resolved_at = models.DateTimeField(null=True, blank=True)
@@ -122,6 +161,10 @@ class Complaint(models.Model):
         if not self.assigned_department and self.category:
             category_to_dept = {
                 'academics': 'Academic Affairs',
+                'infrastructure': 'Facilities Management',
+                'washroom': 'Maintenance',
+                'classroom': 'Facilities Management',
+                'lab': 'Facilities Management',
                 'facilities': 'Facilities Management',
                 'hostel': 'Hostel Administration',
                 'library': 'Library',

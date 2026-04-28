@@ -77,6 +77,8 @@ export async function apiRegister(data: {
   name: string
   roll_number: string
   email: string
+  branch: string
+  year: string
   department: string
   password: string
   confirm_password: string
@@ -122,6 +124,11 @@ export interface ComplaintData {
   remarks: string | null
   attachment: string | null
   is_anonymous: boolean
+  block: string | null
+  floor: string | null
+  room_type: string | null
+  room_number: string | null
+  gender: string | null
   rating: number | null
   feedback: string | null
   resolved_at: string | null

@@ -11,7 +11,12 @@ import Image from "next/image"
 import { Eye, EyeOff, ArrowLeft, UserPlus, Mail, CheckCircle2 } from "lucide-react"
 import { apiRegister, apiSendOTP, apiVerifyOTP } from "@/lib/api"
 
-const departments = ["Computer Science", "Electronics", "Mechanical", "Civil", "Electrical", "Information Technology"]
+const branches = [
+  "CSE", "IT", "ECE", "EEE", "MECH", "CIVIL", 
+  "CSB", "CSM", "CSD", "MECHATRONICS", "MME"
+]
+
+const years = ["1", "2", "3", "4"]
 
 export default function StudentRegisterPage() {
   const router = useRouter()
@@ -22,6 +27,8 @@ export default function StudentRegisterPage() {
     fullName: "", 
     rollNumber: "", 
     email: "", 
+    branch: "",
+    year: "",
     department: "", 
     password: "", 
     confirmPassword: "",
@@ -94,7 +101,8 @@ export default function StudentRegisterPage() {
     else if (!ROLL_NO.test(formData.rollNumber.trim()))
       e.rollNumber = "Roll number must be exactly 10 characters (e.g. 21A91A0501)"
 
-    if (!formData.department) e.department = "Department is required"
+    if (!formData.branch) e.branch = "Branch is required"
+    if (!formData.year) e.year = "Year is required"
     if (!formData.password) e.password = "Password is required"
     else if (formData.password.length < 6) e.password = "Minimum 6 characters"
     if (formData.password !== formData.confirmPassword) e.confirmPassword = "Passwords do not match"
@@ -112,7 +120,9 @@ export default function StudentRegisterPage() {
         name: formData.fullName,
         roll_number: formData.rollNumber,
         email: formData.email,
-        department: formData.department,
+        branch: formData.branch,
+        year: formData.year,
+        department: formData.branch, // Use branch as department for backward compatibility
         password: formData.password,
         confirm_password: formData.confirmPassword,
       })
@@ -308,17 +318,32 @@ export default function StudentRegisterPage() {
                     : <p className="text-xs text-gray-400">Exactly 10 alphanumeric characters</p>}
                 </div>
 
-                <div className="space-y-1.5">
-                  <Label className="text-sm font-medium text-gray-700">Department</Label>
-                  <Select value={formData.department} onValueChange={(v) => set("department", v)} disabled={loading}>
-                    <SelectTrigger className={`h-10 border-gray-300 bg-white text-gray-900 shadow-sm ${errors.department ? "border-red-400" : ""}`}>
-                      <SelectValue placeholder="Select your department" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {departments.map((d) => <SelectItem key={d} value={d}>{d}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                  {errors.department && <p className="text-xs text-red-500">{errors.department}</p>}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <Label className="text-sm font-medium text-gray-700">Branch</Label>
+                    <Select value={formData.branch} onValueChange={(v) => set("branch", v)} disabled={loading}>
+                      <SelectTrigger className={`h-10 border-gray-300 bg-white text-gray-900 shadow-sm ${errors.branch ? "border-red-400" : ""}`}>
+                        <SelectValue placeholder="Select branch" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {branches.map((b) => <SelectItem key={b} value={b}>{b}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                    {errors.branch && <p className="text-xs text-red-500">{errors.branch}</p>}
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label className="text-sm font-medium text-gray-700">Year</Label>
+                    <Select value={formData.year} onValueChange={(v) => set("year", v)} disabled={loading}>
+                      <SelectTrigger className={`h-10 border-gray-300 bg-white text-gray-900 shadow-sm ${errors.year ? "border-red-400" : ""}`}>
+                        <SelectValue placeholder="Select year" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {years.map((y) => <SelectItem key={y} value={y}>{y === "1" ? "1st Year" : y === "2" ? "2nd Year" : y === "3" ? "3rd Year" : "4th Year"}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                    {errors.year && <p className="text-xs text-red-500">{errors.year}</p>}
+                  </div>
                 </div>
 
                 <div className="space-y-1.5">
