@@ -40,12 +40,12 @@ const priorities: { value: Priority; label: string; color: string }[] = [
 const blocks = ['A', 'B', 'C', 'D', 'E', 'F']
 
 const floorsByBlock: Record<string, string[]> = {
-  'A': ['Ground Floor', '1st Floor'],  // 2 floors total
-  'B': ['Ground Floor', '1st Floor', '2nd Floor'],  // 3 floors total
-  'C': ['Ground Floor', '1st Floor', '2nd Floor'],  // 3 floors total
-  'D': ['Ground Floor', '1st Floor', '2nd Floor', '3rd Floor', '4th Floor'],  // 5 floors total (was 4)
-  'E': ['Ground Floor', '1st Floor', '2nd Floor', '3rd Floor', '4th Floor', '5th Floor', '6th Floor'],  // 7 floors total
-  'F': ['Ground Floor']  // 1 floor total
+  'A': ['Ground Floor', '1st Floor', '2nd Floor'],  // 2 floors above ground
+  'B': ['Ground Floor', '1st Floor', '2nd Floor', '3rd Floor'],  // 3 floors above ground
+  'C': ['Ground Floor', '1st Floor', '2nd Floor', '3rd Floor'],  // 3 floors above ground
+  'D': ['Ground Floor', '1st Floor', '2nd Floor', '3rd Floor', '4th Floor'],  // 4 floors above ground
+  'E': ['Ground Floor', '1st Floor', '2nd Floor', '3rd Floor', '4th Floor', '5th Floor', '6th Floor', '7th Floor'],  // 7 floors above ground
+  'F': ['Ground Floor', '1st Floor']  // 1 floor above ground (clubs)
 }
 
 const roomTypes = [
